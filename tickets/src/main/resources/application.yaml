@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: tickets
+
+  datasource:
+#    url: jdbc:postgresql://localhost:5555/tickets
+#    username: admin
+#    password: 123
+    url: ${URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath*:database/initDB.sql
+
+  jpa:
+    database: postgresql
+    properties.hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8000
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
