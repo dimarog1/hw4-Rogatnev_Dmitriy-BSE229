@@ -1,0 +1,63 @@
+version: '3'
+services:
+  auth-db:
+    image: 'postgres:latest'
+    container_name: auth-db
+    restart: on-failure:10
+    environment:
+      - 'POSTGRES_DB=auth'
+      - 'POSTGRES_USER=admin'
+      - 'POSTGRES_PASSWORD=123'
+    ports:
+      - '6432:5432'
+    networks:
+      - network
+
+  tickets-db:
+    image: 'postgres:latest'
+    container_name: tickets-db
+    restart: on-failure:10
+    environment:
+      - 'POSTGRES_DB=tickets'
+      - 'POSTGRES_USER=admin'
+      - 'POSTGRES_PASSWORD=123'
+    ports:
+      - '5555:5432'
+    networks:
+      - network
+
+  auth-app:
+    container_name: auth-app
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    networks:
+      - network
+    depends_on:
+      - auth-db
+    environment:
+      - URL=jdbc:postgresql://auth-db:5432/auth
+      - USERNAME=admin
+      - PASSWORD=123
+
+  tickets-app:
+    build:
+      context: ./tickets
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    networks:
+      - network
+    depends_on:
+      - tickets-db
+      - auth-db
+      - auth-app
+    environment:
+      - URL=jdbc:postgresql://tickets-db:5432/tickets
+      - USERNAME=admin
+      - PASSWORD=123
+
+networks:
+  network:
